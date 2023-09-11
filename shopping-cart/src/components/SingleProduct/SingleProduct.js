@@ -1,5 +1,4 @@
 import { useParams } from 'react-router-dom';
-import useFetch from '../../hooks/useFetch';
 import { useState, useContext, useEffect } from 'react';
 
 import {
@@ -12,14 +11,48 @@ import {
 } from 'react-icons/fa'
 import RelatedProducts from './RelatedProducts/RelatedProducts';
 import { Context } from '../../utils/context';
+import axios from 'axios';
+
 
 
 
 function SingleProduct() {
   const [quantity, setQuantity] = useState(1);
+  const [data, setData] = useState()
   const { id } = useParams();
   const { handleAddToCart } = useContext(Context)
-  const { data } = useFetch(`/api/products?populate=*&[filters][id]=${id}`)
+
+
+  const params = {
+    headers: {
+      Authorization: 'bearer ' + process.env.REACT_APP_STRIPE_KEY
+    }
+
+  }
+
+  const fetchFromApi = async (url) => {
+    try {
+      const { data } = await axios.get(process.env.REACT_APP_DEV_URL + url,
+        params
+      )
+      setData(data)
+    } catch (error) {
+      return (error)
+    }
+  }
+
+  
+
+
+
+  useEffect(() => {
+    fetchFromApi(`/api/products?populate=*&[filters][id]=${id}`)
+  }, [id])
+
+
+
+
+
 
   const increment = () => {
     setQuantity((prevState) => prevState + 1)
@@ -34,7 +67,6 @@ function SingleProduct() {
   if (!data) return;
   const product = data.data[0].attributes
 
-  console.log(id,data, 'single');
   return (
     // single-product-main-content
     <div className='my-5 mx-0 md:my-[74px] md:mx-0'>

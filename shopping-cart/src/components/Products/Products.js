@@ -16,7 +16,7 @@ function Products({ innerPage, headingText, products }) {
 
       {/* products */}
       <div className='flex flex-wrap gap-2 md:gap-4'>
-        { 
+        {
           products?.data?.map((item) => (
             <Product
               key={item.id}
